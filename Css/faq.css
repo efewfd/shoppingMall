@@ -1,0 +1,87 @@
+body {
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #fff;
+}
+.faq-container {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+.recommended-box {
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    font-size: 20px;
+    margin-bottom: 40px;
+}
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+.main-section {
+    display: flex;
+    gap: 40px;
+}
+.side-menu {
+    width: 180px;
+    height: 237px;
+    border: 1px solid #ccc;
+}
+a {
+    text-decoration-line: none;
+    font-family: 'Segoe UI', sans-serif;
+    color: #333;
+}
+.side-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.side-menu li {
+    padding: 12px;
+    border-bottom: 1px solid #ccc;
+    text-align: center;
+}
+.side-menu li.active {
+    background-color: #fbb;
+    font-weight: bold;
+}
+.faq-content {
+    flex: 1;
+}
+.faq-tabs {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    border: 1px solid #ccc;
+    border-bottom: none;
+}
+.faq-tabs div {
+    text-align: center;
+    padding: 10px;
+    border-right: 1px solid #ccc;
+    cursor: pointer;
+}
+.faq-tabs div.active {
+    background: #fbb;
+    font-weight: bold;
+}
+.faq-tabs div:last-child {
+    border-right: none;
+}
+.faq-list {
+    border: 1px solid #ccc;
+}
+.faq-item {
+    border-top: 1px solid #ccc;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+.faq-item:hover {
+    background: #f9f9f9;
+}

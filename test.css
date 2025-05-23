@@ -1,0 +1,184 @@
+/* ============================ */
+/* 🔷 전체 공통 스타일 */
+/* ============================ */
+
+body {
+    font-family: sans-serif;         /* 깔끔한 기본 글씨체 */
+    padding: 20px;                   /* 페이지 전체 여백 */
+ }
+ 
+ input,
+ button {
+    font-size: 14px;                 /* 입력창/버튼 글씨 크기 */
+    padding: 6px;                    /* 내부 여백 */
+    box-sizing: border-box;         /* 전체 크기에 padding 포함 */
+ }
+ 
+ /* ============================ */
+ /* 🔷 채팅창 공통 영역 스타일 */
+ /* ============================ */
+ 
+ #chat {
+    height: 300px;                   /* 고정 높이 */
+    border: 1px solid #ccc;         /* 테두리 */
+    overflow-y: scroll;             /* 스크롤 가능 */
+    padding: 10px;                  /* 내부 여백 */
+    margin-bottom: 10px;            /* 아래 여백 */
+ }
+ 
+ /* 메시지 입력 및 버튼 영역 */
+ #controls {
+    display: flex;                  /* 가로 배치 */
+    gap: 10px;                      /* 요소 간 간격 */
+    margin-top: 10px;
+ }
+ 
+ #controls textarea {
+    flex-grow: 1;                   /* 가능한 넓게 차지 */
+    resize: none;                   /* 사이즈 조절 막기 */
+    font-size: 14px;
+    padding: 6px;
+    height: auto;
+    min-height: 38px;               /* 버튼 높이와 맞춤 */
+    box-sizing: border-box;
+    line-height: 1.4;
+ }
+ 
+ #controls button {
+    width: auto;
+    cursor: pointer;
+ }
+ 
+ .date-bubble {
+    display: block;                     /* 블록 요소로 만들어서 중앙 정렬 가능하게 함 */
+    margin: 0 auto 10px auto;           /* 좌우 자동 → 가운데 정렬, 아래 여백 10px */
+    background-color: #e8a7a7;          /* 말풍선 배경색 (분홍톤) */
+    color: white;                       /* 글자색을 흰색으로 지정 */
+    font-size: 13px;                    /* 글자 크기 작게 */
+    padding: 4px 12px;                  /* 위아래 4px, 좌우 12px 여백 → 말풍선 느낌 */
+    border-radius: 20px;                /* 말풍선처럼 둥글게 */
+    width: fit-content;                 /* 말풍선이 텍스트 길이에 맞게 크기 조절됨 */
+    text-align: center;                 /* 내부 텍스트를 중앙 정렬 */
+ }
+ 
+ /* ============================ */
+ /* 🔷 관리자 화면 - 고객 목록 영역 */
+ /* ============================ */
+ 
+ #users {
+    width: 150px;                   /* 고정 너비 */
+    border: 1px solid #ccc;
+    padding: 10px;
+    height: 350px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+ }
+ 
+ #users button {
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 6px 8px;
+    font-size: 14px;
+    text-align: left;
+    line-height: 1.4;
+ }
+ 
+ /* ✅ 고객 목록 버튼 옆 빨간 알림 점 */
+ .user-alert {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background-color: red;
+    border-radius: 50%;
+    margin-left: 6px;
+    vertical-align: middle;
+ }
+ 
+ /* ============================ */
+ /* 🔷 채팅 말풍선 스타일 (공통) */
+ /* ============================ */
+ 
+ .chat-msg {
+    display: flex;                     /* 수평 정렬을 위한 flex */
+    align-items: flex-end;            /* 말풍선과 시간 정렬 */
+    margin: 8px 0;
+    max-width: 80%;
+    clear: both;
+    word-break: break-word;
+    font-size: 14px;
+ }
+ 
+ .msg-bubble {
+    padding: 8px 12px;
+    border-radius: 10px;
+    background-color: #f1f0f0;
+    max-width: 100%;
+ }
+ 
+ .msg-time {
+    font-size: 12px;
+    color: gray;
+    margin: 0 6px;
+    white-space: nowrap;
+    vertical-align: bottom;
+ }
+ 
+ /* 보낸 사람: 오른쪽 (분홍색 말풍선) */
+ .admin-view .chat-msg.admin,
+ .customer-view .chat-msg.customer {
+    justify-content: flex-end;        /* 오른쪽 정렬 */
+    flex-direction: row-reverse;      /* 말풍선 → 시간 */
+ }
+ 
+ .admin-view .chat-msg.admin .msg-bubble,
+ .customer-view .chat-msg.customer .msg-bubble {
+    background-color: #e8a7a7;
+    color: white;
+ }
+ 
+ /* 받는 사람: 왼쪽 (회색 말풍선) */
+ .admin-view .chat-msg.customer,
+ .customer-view .chat-msg.admin {
+    justify-content: flex-start;      /* 왼쪽 정렬 */
+    flex-direction: row;              /* 시간 → 말풍선 */
+ }
+ 
+ .admin-view .chat-msg.customer .msg-bubble,
+ .customer-view .chat-msg.admin .msg-bubble {
+    background-color: #f1f0f0;
+    color: black;
+ }
+ 
+ /* ============================ */
+ /* 🔷 문의 종료 메시지 스타일 */
+ /* ============================ */
+ 
+ #chat > .end-msg {
+    text-align: center;
+    color: red;
+    font-weight: bold;
+    margin-top: 20px;
+ }
+ 
+ /* ============================ */
+ /* 🔷 메시지 읽음 상태 아이콘 스타일 */
+ /* ============================ */
+ 
+ .read-status {
+    font-size: 12px;                /* 작은 글씨 */
+    color: gray;                    /* 기본 회색 */
+    margin-right: 6px;              /* 텍스트와의 간격 */
+    vertical-align: middle;
+ }
+ 
+ .read-status.✔️ {
+    color: green;                   /* 읽음 상태: 초록색 */
+ }
+ 
+ .read-status.⌛ {
+    color: red;                     /* 안 읽음 상태: 빨간색 */
+ }

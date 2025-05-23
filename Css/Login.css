@@ -1,0 +1,58 @@
+.login-page {
+    width: 280px;
+    height: 250px;
+    margin: auto;
+    padding: 60px;
+    font-size: 15px;
+    line-height: 50px;
+}
+
+.login-page h2 {
+    font-size: 20px;
+    text-align: center;     /*텍스트 중간 배열*/
+}
+
+.Email {
+    width: 250px;
+    height: 30px;
+    font-size: 15px;
+    outline: none;      /*클릭했을 때 나타나는 검은 선 제거*/
+    padding-left: 10px;         /*왼쪽에 10정도의 간격 부여*/
+    border-width: 0 0 1px;
+}
+
+.Password {
+    width: 250px;
+    height: 30px;
+    font-size: 15px;
+    outline: none;
+    padding-left: 10px;
+    border-width: 0 0 1px;
+}
+
+.login-but {
+    width: 260px;
+    height: 30px;
+    font-size: 15px;
+    border-radius: 10px;
+    border: 0;
+    outline: none;
+    padding-left: 10px;
+    cursor: pointer;
+}
+
+.login-but:active {
+    background-color: lightslategray;
+}
+
+.login-page label{
+    cursor: pointer;
+}
+
+.login-form label {
+    display: block;
+}
+
+.SingUp-page {
+    text-align: center;
+}

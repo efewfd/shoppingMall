@@ -1,0 +1,95 @@
+.mypage-wrapper {
+  display: flex;
+  padding: 30px;
+}
+
+.sidebar {
+  width: 200px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 20px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  padding: 10px 0;
+  cursor: pointer;
+  color: #333;
+}
+
+.sidebar li.active {
+  font-weight: bold;
+  color: #000;
+}
+
+.cart-area {
+  flex: 1;
+  padding: 20px 40px;
+  background-color: #fff;
+  margin-left: 20px;
+}
+
+.cart-area h2 {
+  margin-bottom: 20px;
+}
+
+.cart-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 30px;
+}
+
+.cart-table th,
+.cart-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+.cart-table img.item-img {
+  width: 80px;
+  height: auto;
+}
+
+.cart-table.empty .empty-msg {
+  text-align: center;
+  padding: 40px;
+  color: #777;
+}
+
+.cart-summary {
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.cart-summary strong {
+  color: crimson;
+}
+
+.cart-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.cart-buttons button {
+  padding: 10px 15px;
+  background-color: #333;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.cart-buttons a {
+  color: white;
+}
+
+.cart-buttons button:hover {
+  background-color: #555;
+}

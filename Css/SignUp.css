@@ -1,0 +1,80 @@
+/* .signup-page {
+    width: 280px;
+    height: 250px;
+    margin: auto;
+    padding: 60px;
+    font-size: 15px;
+    line-height: 50px;
+} */
+.signup-page {
+    width: 280px;
+    margin: auto;
+    padding: 60px 20px;
+    font-size: 15px;
+    line-height: 40px;
+}
+
+.signup-page h2 {
+    font-size: 20px;
+    text-align: center;     /*텍스트 중간 배열*/
+}
+
+.customer-id-group input,
+.signup-pasword-group input,
+.signup-pasword-check-group input,
+.name-group input {
+    border: none;
+    border-bottom: 1px solid #aaa;
+    outline: none;
+    background-color: transparent;
+    font-size: 15px;
+    padding: 5px 0;
+    width: 280px;
+    box-sizing: border-box;
+}
+
+.email-group {
+    width: 100%;
+}
+
+.signup-email-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+}
+
+.signup-email-input input {
+    flex: 1;
+    border: none;
+    border-bottom: 1px solid #aaa;
+    outline: none;
+    background-color: transparent;
+    font-size: 15px;
+    padding: 5px 0;
+    min-width: 0;       /*넘어가는거 방지지*/
+}
+
+.signup-email-input select {
+    padding: 5px;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    background-color: white;
+}
+
+.signup-but {
+    width: 280px;
+    height: 35px;
+    font-size: 15px;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    background-color: #eee;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.signup-but:active {
+    background-color: lightslategray;
+}

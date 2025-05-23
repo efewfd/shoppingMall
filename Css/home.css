@@ -1,0 +1,70 @@
+/*전체 영역에서 여백 없애기*/
+* {
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    text-decoration: none;      /*텍스트 밑줄 제거*/
+    color: black;       /*텍스트 색상 지정*/
+}
+
+/*네비게이션바*/
+.Navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 30px;
+}
+
+.products {
+    list-style-type: none;
+    display: flex;      /*플렉스박스 적용*/
+    justify-content: center;        /*가로 중앙 정렬*/
+    align-items: center;        /*세로 중앙 정렬*/
+    gap: 30px;          /*메뉴 간의 간격 설정*/
+}
+.products li {
+    cursor: pointer;
+    position: relative;     /* 드롭다운 위치 기준점 */
+    white-space: nowrap;        /*줄 바꿈없음, 한줄로 정렬*/
+    padding: 5px;
+}
+/*드롭다운*/
+.sub-category {
+    display: none;      /*해당 요소가 보이지 않도록 함*/
+    position: absolute;
+    top: 100%;      /* 상의 아래로 위치 */
+    left: 50%;      /* 좌측에서 50% 지점 */
+    transform: translateX(-50%);        /* 가운데 정렬 보정 */
+    padding: 10px;
+    background-color: white;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);     /*드롭다운 박스 근처에 연한 그림자자*/
+    z-index: 10;        /*다른 요소 보다 위에*/
+}
+
+.sub-category ul{
+    list-style-type: none;
+}
+
+li:hover .sub-category {
+    display: block;         /*호버 시 드롭다운 표시*/
+}
+
+.listbar {
+    list-style-type: none;
+    display: flex;
+    justify-content: flex-end;
+    gap: 20px;
+}
+
+.listbar li {
+    cursor: pointer;
+}
+
+.test {
+    width: 100%;          /* 전체 너비 */
+    max-height: 400px;    /* 최대 높이 제한 */
+    object-fit: cover;    /* 비율 유지하면서 꽉 채우기 */
+    margin-top: 20px;
+}
