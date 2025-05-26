@@ -29,7 +29,6 @@ if (hasItems) {
         <button onclick="changeQuantity('${item.id}', -1)">-</button>
         <span id="qty-${item.id}">${item.quantity || 1}</span>
         <button onclick="changeQuantity('${item.id}', 1)">+</button>
-        <button onclick="updateQuantity('${item.id}')">수정</button>
       </td>
       <td>무료배송</td>
       <td>0원</td>
@@ -47,16 +46,54 @@ if (hasItems) {
     `총 구매금액: ${totalPrice.toLocaleString()}원 + 배송료: 0원 = <strong>${totalPrice.toLocaleString()}원</strong>`;
 }
 
+// 전체 상품 주문하기 함수
+async function submitAllOrders() {
+  const userId = localStorage.getItem("userId");
+
+  try {
+    for (const item of cart) {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId,
+          productId: item.id, // 또는 item.id 등 실제 key에 맞춰 수정
+          quantity: item.quantity,
+          status: "배송준비중"
+        })
+      });
+
+      if (!res.ok) throw new Error("주문 실패");
+    }
+
+    alert("모든 상품이 주문되었습니다!");
+    localStorage.removeItem("cart"); // 장바구니 비우기
+    location.href = "delivery.html"; // 배송조회 페이지로 이동
+
+  } catch (err) {
+    console.error("주문 처리 중 오류:", err);
+    alert("주문 중 오류가 발생했습니다.");
+  }
+}
+
 // 상품 삭제 함수
-function removeItem(id) {
+async function removeItem(id) {
   const cart = JSON.parse(localStorage.getItem('cart')) || [];
   const updatedCart = cart.filter(item => item.id !== id); // 클릭한 상품 제외
 
   localStorage.setItem('cart', JSON.stringify(updatedCart));
+
+  // MongoDB
+  await fetch('/api/cart/delete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ productId: id })
+  });
+
   window.location.reload(); // 삭제 후 화면 갱신
 }
 
-// 수량 변겅 함수
+// 수량 변경 함수
 async function changeQuantity(id, diff) {
   const cart = JSON.parse(localStorage.getItem('cart')) || [];
   const index = cart.findIndex(item => item.id === id);
@@ -76,10 +113,10 @@ async function changeQuantity(id, diff) {
       return;
     }
 
-    console.log('[📤 fetch 실행]', { productId: id, quantity: newQty });
     cart[index].quantity = newQty;
     localStorage.setItem('cart', JSON.stringify(cart));
 
+    // MongoDB에 반영
     await fetch('/api/cart/update', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -90,27 +127,7 @@ async function changeQuantity(id, diff) {
   }
 }
 
-// 수량 변경(MongoDB)
-async function updateQuantity(id) {
-  const span = document.getElementById(`qty-${id}`);
-  const quantity = parseInt(span.textContent);
-
-  if (isNaN(quantity) || quantity < 1) {
-    alert('수량이 유효하지 않습니다.');
-    return;
-  }
-
-  // MongoDB에 반영
-  await fetch('/api/cart/update', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ productId: id, quantity })
-  });
-
-  alert('수정 완료!');
-  window.location.reload();
-}
-
+// 전체 상품 지우기
 async function clearCart() {
   const confirmed = confirm('정말로 모든 상품을 삭제하시겠습니까?');
 

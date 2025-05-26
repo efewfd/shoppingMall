@@ -11,7 +11,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       listbar.innerHTML = `
         <li><a href="#" id="logout-btn">로그아웃</a></li>
         <li><a href="/cart.html">장바구니</a></li>
-        <li>마이페이지</li>
+        <li><a href="/myInfo.html">마이페이지</a></li>
       `;
 
       // 로그아웃 클릭 이벤트
@@ -26,7 +26,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       listbar.innerHTML = `
         <li><a href="/Login.html">로그인</a></li>
         <li><a href="/cart.html">장바구니</a></li>
-        <li>마이페이지</li>
+        <li><a href="/myInfo.html">마이페이지</a></li>
       `;
     }
 

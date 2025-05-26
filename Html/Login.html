@@ -21,15 +21,15 @@
                     </div>
                 </li>
                 <li>
-                    <a href="./consultation/consultation.html">상의</a>
+                    <a href="./top/consultation.html">상의</a>
                     <div class="sub-category">
                         <ul>
-                            <li><a href="./consultation/basic.html">기본</a></li>
-                            <li><a href="./consultation/casual.html">캐주얼</a></li>
-                            <li><a href="./consultation/sweatshirt.html">맨투맨</a></li>
-                            <li><a href="./consultation/hoddie.html">후드티</a></li>
-                            <li><a href="./consultation/shirt.html">셔츠</a></li>
-                            <li><a href="./consultation/blouse.html">블라우스</a></li>
+                            <li><a href="./top/basic.html">기본</a></li>
+                            <li><a href="./top/casual.html">캐주얼</a></li>
+                            <li><a href="./top/sweatshirt.html">맨투맨</a></li>
+                            <li><a href="./top/hoddie.html">후드티</a></li>
+                            <li><a href="./top/shirt.html">셔츠</a></li>
+                            <li><a href="./top/blouse.html">블라우스</a></li>
                         </ul>
                     </div>
                 </li>
@@ -80,6 +80,11 @@
             </form>
 
             <p class="SingUp-page"><a href="SignUp.html">Sign Up</a></p>
+            <p class="find-links">
+              <a href="find-id.html">아이디 찾기</a> | 
+              <a href="find-password.html">비밀번호 찾기</a>
+            </p>
+
         </div>
         <script>
             document.getElementById('login-form').addEventListener('submit', async (e) => {
@@ -99,18 +104,23 @@
                 // }
 
                 const res = await fetch('/api/auth/login', {
-                method: 'POST',
-                body: formData
+                  method: 'POST',
+                  body: formData
                 });
 
                 const data = await res.json();
                 console.log('[로그인 응답]', data);
 
                 if (res.ok) {
-                alert('로그인 성공!');
-                window.location.href = 'home.html'; // 로그인 성공 시 홈으로 이동
+                  // 로그인 성공 시 사용자 정보 저장
+                  localStorage.setItem("user", JSON.stringify(data));
+                  localStorage.setItem("isLogin", "true");
+                  localStorage.setItem('userId', data.user.userId);
+
+                  alert('로그인 성공!');
+                  window.location.href = '/home.html'; // 로그인 성공 시 홈으로 이동
                 } else {
-                alert('로그인 실패: ' + data.message);
+                  alert('로그인 실패: ' + data.message);
                 }
             });
 

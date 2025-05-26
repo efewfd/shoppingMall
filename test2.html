@@ -2,170 +2,132 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>마이페이지</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MY 정보</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
       margin: 0;
-      background: #f9f9f9;
-      color: #333;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f6f6f6;
     }
-    .mypage-wrapper {
-      max-width: 1200px;
+    .container {
+      max-width: 1000px;
       margin: 0 auto;
-      padding: 40px 20px;
-    }
-    .mypage-title {
-      font-size: 28px;
-      font-weight: bold;
-      text-align: center;
-      margin-bottom: 40px;
-    }
-    .user-summary {
+      padding: 30px;
       background: #fff;
-      border: 1px solid #ddd;
-      padding: 20px;
+    }
+    header {
+      text-align: center;
+      font-size: 24px;
+      padding: 10px 0;
+      border-bottom: 1px solid #ddd;
+    }
+    .main-section {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
+      margin-top: 30px;
+    }
+    .side-menu {
+      width: 150px;
+      border: 1px solid #ccc;
+      margin-right: 30px;
+    }
+    .side-menu ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .side-menu li {
+      padding: 12px;
+      border-bottom: 1px solid #ccc;
+      text-align: center;
+    }
+    .side-menu li.active {
+      background-color: #fbb;
+      font-weight: bold;
+    }
+    .content {
+      flex: 1;
     }
     .user-info {
-      line-height: 1.8;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 20px;
     }
-    .info-box {
-      display: flex;
-      justify-content: space-between;
-      background: #fff;
-      border: 1px solid #ddd;
-      text-align: center;
-      margin-bottom: 30px;
+    .user-info p {
+      margin: 4px 0;
     }
-    .info-box div {
-      flex: 1;
-      padding: 20px;
-      border-right: 1px solid #eee;
-    }
-    .info-box div:last-child {
-      border-right: none;
-    }
-    .info-box strong {
-      display: block;
-      font-size: 18px;
-      margin-bottom: 5px;
-    }
-    .tab-menu {
-      display: flex;
-      flex-wrap: wrap;
-      border: 1px solid #ddd;
-      background: #fff;
-      margin-bottom: 30px;
-    }
-    .tab-menu a {
-      flex: 1;
-      text-align: center;
-      padding: 15px 0;
-      border-right: 1px solid #eee;
-      text-decoration: none;
-      color: #333;
-    }
-    .tab-menu a:last-child {
-      border-right: none;
+    .edit-btn {
+      margin-top: 10px;
+      padding: 8px 12px;
+      border: none;
+      background-color: #bbb;
+      color: #fff;
+      cursor: pointer;
     }
     .section {
-      background: #fff;
-      border: 1px solid #ddd;
-      margin-bottom: 20px;
+      margin-top: 30px;
+      border-top: 1px solid #ccc;
+      padding-top: 20px;
     }
-    .section h3 {
-      font-size: 18px;
-      padding: 15px;
+    .section-title {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .wishlist-item {
+      padding: 10px 0;
       border-bottom: 1px solid #eee;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    th, td {
-      border-top: 1px solid #eee;
-      padding: 12px;
-      text-align: center;
-    }
-    th {
-      background-color: #f2f2f2;
-    }
-    .empty-msg {
-      padding: 30px;
-      text-align: center;
-      color: #999;
     }
   </style>
 </head>
 <body>
-  <div class="mypage-wrapper">
-    <div class="mypage-title">마이페이지</div>
+  <div class="container">
+    <header>MY Page</header>
+    <div class="main-section">
+      <aside class="side-menu">
+        <ul>
+          <li class="active">MY 정보</li>
+          <li><a href="cart.html">장바구니</a></li>
+          <li><a href="delivery.html">배송조회</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="#">1:1 문의</a></li>
+        </ul>
+      </aside>
 
-    <div class="user-summary">
-      <div class="user-info">
-        <strong>안녕하세요, 이다은님!</strong>
-        전화: 010-1234-5678<br>
-        이메일: ek2004jj@gmail.com<br>
-        주소: 서울시 강남구 ~ <button>정보수정</button>
-      </div>
-    </div>
+      <section class="content">
+        <div class="user-info">
+          <p><strong>안녕하세요, ○○○님</strong></p>
+          <p>이메일: abc@abc.com</p>
+          <button class="edit-btn">회원정보 수정</button>
+        </div>
 
-    <div class="info-box">
-      <div><strong>0원</strong>총 주문금액</div>
-      <div><strong>0개</strong>장바구니</div>
-      <div><strong>0원</strong>적립금</div>
-      <div><strong>0원</strong>예치금</div>
-      <div><strong>1장</strong>쿠폰</div>
-    </div>
+        <div class="section">
+          <div class="section-title">최근 결제 내역</div>
+          <p>내용 없음</p>
+        </div>
 
-    <div class="tab-menu">
-      <a href="#">주문조회</a>
-      <a href="#">적립금</a>
-      <a href="#">예치금</a>
-      <a href="#">쿠폰</a>
-      <a href="#">관심상품</a>
-      <a href="#">최근본상품</a>
-      <a href="#">내 게시글</a>
-      <a href="#">1:1문의</a>
-      <a href="#">회원탈퇴</a>
-    </div>
+        <div class="section">
+          <div class="section-title">찜한 상품</div>
+          <div id="wishlist-container">불러오는 중...</div>
+        </div>
 
-    <div class="section">
-      <h3>최근 주문 정보</h3>
-      <table>
-        <thead>
-          <tr><th>주문일자</th><th>상품명</th><th>결제금액</th><th>주문상세</th></tr>
-        </thead>
-        <tbody>
-          <tr><td colspan="4" class="empty-msg">주문 내역이 없습니다.</td></tr>
-        </tbody>
-      </table>
-    </div>
+        <script>
+          window.addEventListener("DOMContentLoaded", () => {
+            const wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+            const container = document.getElementById("wishlist-container");
 
-    <div class="section">
-      <h3>최근 등록 게시글</h3>
-      <table>
-        <thead>
-          <tr><th>등록일자</th><th>제목</th><th>게시판</th></tr>
-        </thead>
-        <tbody>
-          <tr><td colspan="3" class="empty-msg">작성된 게시글이 없습니다.</td></tr>
-        </tbody>
-      </table>
-    </div>
+            if (wishlist.length === 0) {
+              container.innerHTML = "<p>찜한 상품이 없습니다.</p>";
+              return;
+            }
 
-    <div class="section">
-      <h3>관심상품</h3>
-      <div class="empty-msg">찜한 상품이 없습니다.</div>
-    </div>
+            container.innerHTML = wishlist.map(p => `
+              <div class="wishlist-item">
+                ❤️ <strong>${p.title}</strong> (${p.price.toLocaleString()}원)
+              </div>
+            `).join('');
+          });
+        </script>
 
-    <div class="section">
-      <h3>최근본상품</h3>
-      <div class="empty-msg">최근 본 상품이 없습니다.</div>
+      </section>
     </div>
   </div>
 </body>

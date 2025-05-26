@@ -11,6 +11,7 @@ const userSchema = new mongoose.Schema({
   name: String,
   email: String,
   cart: [cartItemSchema], // 유저별 장바구니 내장 배열
+  isActive: { type: Boolean, default: true }, // 잠금 처리용
   createdAt: { type: Date, default: Date.now }
 });
 

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>아이디 찾기</title>
+</head>
+<body>
+  <h2>아이디 찾기</h2>
+  <form id="find-id-form">
+    <label>이메일 입력:</label>
+    <input type="email" name="email" required />
+    <button type="submit">아이디 찾기</button>
+  </form>
+  <p id="result-id"></p>
+
+  <script>
+    document.getElementById('find-id-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = e.target.email.value;
+
+      const res = await fetch('/api/auth/find-id', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+
+      const data = await res.json();
+      document.getElementById('result-id').textContent = data.userId || data.message;
+    });
+  </script>
+</body>
+</html>
