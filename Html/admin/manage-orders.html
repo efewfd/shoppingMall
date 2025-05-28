@@ -44,9 +44,12 @@
         <tr>
           <th>주문 ID</th>
           <th>사용자 ID</th>
+          <th>회원 이름</th>
           <th>상품 ID</th>
+          <th>상품명</th>
           <th>수량</th>
           <th>상태</th>
+          <th>주문일시</th>
           <th>변경</th>
         </tr>
       </thead>
@@ -68,9 +71,12 @@
           <tr>
             <td>${order._id}</td>
             <td>${order.userId}</td>
+            <td>${order.user_name || '-'}</td>
             <td>${order.productId}</td>
+            <td>${order.product_name || '-' || order.product_title}</td>
             <td>${order.quantity}</td>
             <td>${order.status}</td>
+            <td>${new Date(order.created_at).toLocaleString()}</td>
             <td>
               <button onclick="updateStatus('${order._id}', '배송중')">배송중</button>
               <button onclick="updateStatus('${order._id}', '배송완료')">배송완료</button>

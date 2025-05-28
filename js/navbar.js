@@ -1,6 +1,8 @@
 window.addEventListener('DOMContentLoaded', async () => {
   try {
-    const res = await fetch('/api/auth/user');
+    const res = await fetch('/api/auth/user', {
+      credentials: 'include'  // 세션 쿠키 포함
+    });
     const data = await res.json();
 
     const listbar = document.querySelector('.listbar');
@@ -15,7 +17,8 @@ window.addEventListener('DOMContentLoaded', async () => {
       `;
 
       // 로그아웃 클릭 이벤트
-      document.getElementById('logout-btn').addEventListener('click', async () => {
+      document.getElementById('logout-btn').addEventListener('click', async (e) => {
+        e.preventDefault();
         await fetch('/api/auth/logout');
         alert('로그아웃 되었습니다.');
         window.location.href = '/Login.html'; // 또는 새로고침

@@ -12,6 +12,7 @@ const Wishlist = require('./models/wishlist');
 const faqRoutes = require('./routes/faqRoutes');
 const wishlistRouter = require('./routes/wishlist');
 const Order = require('./models/Order');
+const reviewRoutes = require('./routes/reviewRoutes');
 
 const app = express();
 const PORT = 3000;
@@ -71,6 +72,7 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/faqs', faqRoutes);
 app.use('/api/wishlist', wishlistRouter);
+app.use('/api/reviews', reviewRoutes);
 
 // 쇼핑몰 라우팅
 app.get('/', (req, res) => {

@@ -161,7 +161,7 @@
 
                 console.log(" 받아온 wishlist:", wishlist);
                 const container = document.getElementById("wishlist-container");
-                if (wishlist.length === 0) {
+                if (!wishlist.length) {
                   container.innerHTML = "<p>찜한 상품이 없습니다.</p>";
                   return;
                 }
