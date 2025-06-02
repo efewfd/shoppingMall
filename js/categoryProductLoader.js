@@ -18,18 +18,50 @@ async function loadCategoryProducts() {
   console.log("요청 URL:", url);
   console.log("category1:", category1);
   console.log("category2:", category2);
+
   try{
-    // 1. 서버에 GET 요청을 보냄 → /api/products
+    // 서버에 GET 요청을 보냄 → /api/products
     const res = await fetch(url);
-    // 2. 응답 데이터를 JSON 형식으로 파싱
+    // 응답 데이터를 JSON 형식으로 파싱
     const products = await res.json();
 
-    // 3. 상품을 표시할 HTML 요소를 가져옴
+    const validatedProducts = [];
+
+    for (const item of products) {
+      // 상품 ID 유효성 체크 (빈 문자열, undefined 등 제거)
+      if (!item || !item._id || typeof item._id !== 'string') {
+        console.warn("유효하지 않은 상품 ID:", item);
+        continue;
+      }
+
+      // 상품이 백엔드에 존재하는지 확인
+      try {
+        const res = await fetch(`/api/products/${item._id}`);
+        if (!res.ok) {
+          console.warn(`삭제된 상품 ID: ${item._id}`);
+          continue;
+        }
+
+        const product = await res.json();
+        if (product && product.name) {
+          validatedProducts.push(product);
+        }
+      } catch (err) {
+        console.warn("상품 확인 실패:", item._id);
+      }
+    }
+    
+    // 상품을 표시할 HTML 요소를 가져옴
     const container = document.getElementById('product-list');
     container.innerHTML = ''; // 기존 내용을 비움
 
-    // 4. 상품 배열을 반복해서 화면에 카드 형태로 출력
-    products.forEach(product => {
+    if (validatedProducts.length === 0) {
+      container.innerHTML = '<p>해당 카테고리에 등록된 상품이 없습니다.</p>';
+      return;
+    }
+
+    // 상품 배열을 반복해서 화면에 카드 형태로 출력
+    validatedProducts.forEach(product => {
       // 상품 카드 div 생성
       const card = document.createElement('div');
       card.className = 'product-card'; // 스타일을 위한 클래스, CSS 적용되게 class도 붙임

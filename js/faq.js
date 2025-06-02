@@ -66,15 +66,23 @@ function renderFaqs(category) {
 
     container.innerHTML = filtered.map(faq => `
         <div class="faq-item">
-            <div class="question">${faq.question} <span>▼</span></div>
-            <div class="answer">${faq.answer}</div>
+            <div class="question">${faq.question} <span class="icon">◀</span></div>
+            <div class="answer" style="display: none;">${faq.answer}</div>
         </div>
     `).join('');
 
     // 아코디언 기능
     document.querySelectorAll(".faq-item .question").forEach(q => {
         q.addEventListener("click", () => {
-            q.parentElement.classList.toggle("active");
+            const answer = q.nextElementSibling;
+            const icon = q.querySelector("span");
+
+            const isVisible = answer.style.display === "block";
+
+            // 토글 동작
+            answer.style.display = isVisible ? "none" : "block";
+            icon.textContent = isVisible ? "◀" : "▼"; // ← 기본은 ◀, 펼치면 ▼
+            // q.parentElement.classList.toggle("active");
         });
     });
 }

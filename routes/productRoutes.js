@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const multer = require('multer');
 const Product = require('../models/product');
+const db = require('../js/db');
 
 // 이미지 업로드 설정
 const storage = multer.diskStorage({
@@ -30,23 +32,54 @@ router.get('/', async (req, res) => {
 });
 
 // 상품 등록
-router.post('/', upload.single('image'), async (req, res) => {
-  try {
+router.post('/', upload.fields([
+    { name: 'image', maxCount: 1 },
+    { name: 'id' },
+    { name: 'name' },
+    { name: 'price' },
+    { name: 'stock' },
+    { name: 'category1' },
+    { name: 'category2' }
+  ]), async (req, res) => {
+  try{
+    console.log("[폼 데이터 수신]", req.body);
+
     const { name, price, stock, category1, category2 } = req.body;
+    const parsedPrice = parseInt(price, 10);
+    const parsedStock = parseInt(stock, 10);
 
     // category2 값이 없으면 에러 응답
     if (!category2) {
       return res.status(400).json({ message: '2차 카테고리를 선택하세요.' });
     }
 
-    const image_url = req.file ? `/uploads/${req.file.filename}` : '';
+    const image_url = req.files?.image?.[0]?.filename? `/uploads/${req.files.image[0].filename}` : '';
 
     // category2 배열 생성 : 선택한 카테고리 + 'all' 자동 추가
     const category2List = [category2, 'all'];
+    const productId = crypto.randomUUID();
+
+    const productData = {
+      _id: productId,
+      name,
+      price: parsedPrice,
+      stock: parsedStock,
+      image_url,
+      category1,
+      category2: category2List
+    };
     
-    const product = new Product({ name, price, stock, image_url, category1, category2: category2List });
+    const product = new Product(productData);
     await product.save();
+
+    await db.execute(
+      `INSERT INTO products (id, name, price, image_url, stock, category1, category2)
+      VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [productId, name, parsedPrice, image_url, parsedStock, category1, category2List.join(',')]
+    );
+
     res.json({ message: '상품 등록 완료', product });
+
   } catch(err) {
     console.error("❌ 상품 등록 중 오류:", err); // 여기 추가해야 콘솔에 원인 뜸!
     res.status(500).json({ message: '상품 등록 실패', error: err.message });
@@ -57,20 +90,43 @@ router.post('/', upload.single('image'), async (req, res) => {
 router.delete('/:id', async (req, res) => {
   console.log('삭제 요청 도착:', req.params.id);
   try {
-    await Product.findByIdAndDelete(req.params.id);
+    const deleted = await Product.findOneAndDelete({ _id: req.params.id });
+
+    if (!deleted) {
+      return res.status(404).json({ message: '상품을 찾을 수 없습니다.' });
+    }
+    
     res.json({ message: '상품 삭제 완료' });
   } catch (err) {
+    console.error('상품 삭제 실패:', err);
     res.status(500).json({ message: '삭제 실패', error: err.message });
   }
 });
 
-// 상품 수정
+// 상품 수정 (MySQL + MongoDB 모두 수정)
 router.put('/:id', async (req, res) => {
   const { name, price, stock } = req.body;
+  const id = req.params.id;
+  
+  console.log("수정 요청:", { id, name, price, stock });
+
   try {
-    await Product.findByIdAndUpdate(req.params.id, { name, price, stock });
-    res.json({ message: '상품 수정 완료' });
+    // MySQL 수정
+    await db.execute(`UPDATE products SET name = ?, price = ?, stock = ? WHERE id = ?`, [name, price, stock, id]);
+    // 기존 코드 : await Product.findByIdAndUpdate(req.params.id, { name, price, stock });
+
+    // MongoDB 수정 (UUID 대응)
+    const mongoResult = await Product.findOneAndUpdate({ _id: id }, {
+      name,
+      price,
+      stock
+    });
+
+    console.log("MongoDB 수정 결과:", mongoResult);
+
+    res.json({ message: '상품 수정 완료 (MySQL + MongoDB)' });
   } catch (err) {
+    console.error('상품 수정 실패:', err.message);
     res.status(500).json({ message: '수정 실패', error: err.message });
   }
 });
@@ -90,10 +146,18 @@ router.get('/random-products', async (req, res) => {
 // 상세 페이지 조회 API
 router.get('/:id', async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const { id } = req.params;
+    // 문자열 기반 _id 조회
+    const product = await Product.findOne({ _id: id });  // 기존 코드 : const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({ message: '상품을 찾을 수 없습니다.' });
+    }
+
     res.json(product);
   } catch (err) {
-    res.status(404).json({ message: '상품을 찾을 수 없습니다.' });
+    console.error('❌ 상품 조회 실패:', err.message);
+    res.status(500).json({ message: '서버 오류', error: err.message });
   }
 });
 

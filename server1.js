@@ -13,6 +13,8 @@ const faqRoutes = require('./routes/faqRoutes');
 const wishlistRouter = require('./routes/wishlist');
 const Order = require('./models/Order');
 const reviewRoutes = require('./routes/reviewRoutes');
+const orderRoutes = require('./routes/orderRoutes');
+const db = require('./js/db');
 
 const app = express();
 const PORT = 3000;
@@ -50,7 +52,11 @@ app.get('/api/wishlist/:userId', async (req, res) => {
 app.use(session({
   secret: 'secret-key', // 나중에 env로 빼기
   resave: false, 
-  saveUninitialized: true
+  saveUninitialized: true,
+  cookie: {
+    httpOnly: true,
+    secure: false   // HTTPS가 아닌 로컬환경일 경우 false여야 작동함
+  }
 }));
 
 
@@ -73,6 +79,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/faqs', faqRoutes);
 app.use('/api/wishlist', wishlistRouter);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/orders', orderRoutes);
 
 // 쇼핑몰 라우팅
 app.get('/', (req, res) => {
@@ -102,15 +109,30 @@ app.listen(PORT, () => {
 
 // POST /api/orders - 주문 저장
 app.post('/api/orders', async (req, res) => {
-  console.log('[📥 주문 도착]', req.body); // 👈 로그 추가
-
   try {
-    const { userId, productId, quantity, status } = req.body;
+    const { userId, productId, quantity, status, product } = req.body;
+    console.log("product.title in server:", product?.title);
 
     if (!userId || !productId) {
-      console.error('❌ 필수값 누락');
+      console.error('필수값 누락');
       return res.status(400).json({ message: 'userId 또는 productId 없음' });
     }
+
+    console.log("저장될 상품명:", product?.title); // 콘솔 찍어서 디버깅 확인
+
+    const sql = `
+      INSERT INTO orders (user_id, product_id, quantity, status, product_title, product_image)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `;
+
+    const values = [
+      userId,
+      productId,
+      quantity,
+      status,
+      product?.title || '',    // product_title 저장!
+      product?.image || ''
+    ];
 
     const newOrder = new Order({
       userId,
@@ -120,11 +142,11 @@ app.post('/api/orders', async (req, res) => {
       product: req.body.product
     });
 
-    await newOrder.save(); // ❗ 이 부분에서 Mongoose 에러 가능성 있음
-    res.json(newOrder);
+    await db.execute(sql, values);
+    res.status(201).json({ message: '주문 저장 완료' });
 
   } catch (err) {
-    console.error('❌ 주문 저장 중 에러:', err.message);
+    console.error('주문 저장 중 에러:', err.message);
     res.status(500).json({ message: '서버 오류', error: err.message });
   }
 });
@@ -150,23 +172,23 @@ app.patch('/api/orders/:id', async (req, res) => {
   res.json(order);
 });
 
-app.post('/api/orders', async (req, res) => {
-  console.log('[주문 요청 도착]', req.body);
+// app.post('/api/orders', async (req, res) => {
+//   console.log('[주문 요청 도착]', req.body);
 
-  try {
-    const { userId, productId, quantity, status } = req.body;
+//   try {
+//     const { userId, productId, quantity, status } = req.body;
 
-    if (!userId || !productId) {
-      console.error("❌ 필수값 누락");
-      return res.status(400).json({ message: "userId 또는 productId 없음" });
-    }
+//     if (!userId || !productId) {
+//       console.error("❌ 필수값 누락");
+//       return res.status(400).json({ message: "userId 또는 productId 없음" });
+//     }
 
-    const newOrder = new Order({ userId, productId, quantity, status });
-    await newOrder.save();
+//     const newOrder = new Order({ userId, productId, quantity, status });
+//     await newOrder.save();
 
-    res.json(newOrder);
-  } catch (err) {
-    console.error("❌ 주문 저장 중 에러:", err);
-    res.status(500).json({ message: "서버 내부 오류", error: err.message });
-  }
-});
+//     res.json(newOrder);
+//   } catch (err) {
+//     console.error("❌ 주문 저장 중 에러:", err);
+//     res.status(500).json({ message: "서버 내부 오류", error: err.message });
+//   }
+// });

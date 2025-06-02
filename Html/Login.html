@@ -87,24 +87,21 @@
 
         </div>
         <script>
+            // [1] 페이지 로딩 시 기억된 아이디 자동 입력
+            window.addEventListener('DOMContentLoaded', () => {
+                const savedId = localStorage.getItem('rememberedId');
+                if (savedId) {
+                    document.getElementById('userId-input').value = savedId;
+                    document.getElementById('rememder-check').checked = true;
+                }
+            });
+
             document.getElementById('login-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const form = e.target;
 
                 // 기존 코드 : const formData = new FormData(form);
                 const userId = e.target.userId.value;
                 const password = e.target.password.value;
-
-                // const userId = formData.get('userId');
-                // const password = formData.get('password');
-                // const remember = document.getElementById('remember-check').checked;
-
-                // '아이디 기억하기'가 체크되어 있으면 저장
-                // if (remember) {
-                //     localStorage.setItem('rememberedUserId', userId);
-                // } else {
-                //     localStorage.removeItem('rememberedUserId');
-                // }
 
                 const res = await fetch('/api/auth/login', {
                   method: 'POST',
@@ -114,19 +111,20 @@
                 });
 
                 const data = await res.json();
-                console.log('[로그인 응답]', data);
-
                 if (res.ok) {
-                  console.log('[로그인 성공]', data);
-                  localStorage.setItem('userId', data.userId);  // 로그인한 사용자 ID 저장
-                  localStorage.setItem('userName', data.name);
-                  // 로그인 성공 시 사용자 정보 저장
-                // 기존 코드:   localStorage.setItem("user", JSON.stringify(data));
-                //   localStorage.setItem("isLogin", "true");
-                //   localStorage.setItem('userId', data.user.userId);
+                    localStorage.setItem('userId', data.user.userId);
+                    localStorage.setItem('userName', data.user.name);
 
-                  alert('로그인 성공!');
-                  window.location.href = '/home.html'; // 로그인 성공 시 홈으로 이동
+                    // 아이디 기억하기 저장 여부 확인
+                    const remember = document.getElementById('rememder-check').checked;
+                    if (remember) {
+                        localStorage.setItem('rememberedId', userId);
+                    } else {
+                        localStorage.removeItem('rememberedId');
+                    }
+
+                    alert('로그인 성공!');
+                    window.location.href = '/home.html'; // 로그인 성공 시 홈으로 이동
                 } else {
                   alert('로그인 실패: ' + data.message);
                 }

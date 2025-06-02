@@ -144,8 +144,7 @@
       </div>
 
       <div class="cart-buttons" style="display: none;">
-        <button onclick="submitAllOrders()">전체상품 주문하기</button>
-        <button disabled>선택상품 주문하기</button>
+        <button onclick="submitAllOrders()">주문하기</button>
         <button onclick="clearCart()">장바구니 비우기</button>
         <button><a href="./home.html">쇼핑 계속하기</a></button>
       </div>
@@ -159,14 +158,6 @@
       if (!data.loggedIn) {
         alert('로그인 후 장바구니를 이용하실 수 있습니다.');
         window.location.href = '/Login.html';
-      }
-
-      const orderBtn = document.getElementById("order-button");
-      if (orderBtn) {
-        orderBtn.addEventListener("click", (e) => {
-          e.preventDefault();
-          submitCheckedOrders(); // cart.js 안에 정의되어 있어야 함
-        });
       }
     });
   </script>
