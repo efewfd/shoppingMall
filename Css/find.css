@@ -1,0 +1,52 @@
+/* 공통 정렬 및 박스 스타일 */
+.find-container {
+  max-width: 400px;
+  margin: 100px auto;
+  padding: 40px 30px;
+  text-align: center;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.find-container h2 {
+  margin-bottom: 30px;
+  font-weight: bold;
+}
+
+.find-container label {
+  display: block;
+  text-align: left;
+  margin-top: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.find-container input {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-bottom: 1px solid #ccc;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.find-container button {
+  margin-top: 30px;
+  width: 100%;
+  padding: 12px;
+  background: #eee;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+.find-container button:hover {
+  background: #ddd;
+}
+
+#result-pw {
+  margin-top: 20px;
+  color: crimson;
+  font-size: 14px;
+}

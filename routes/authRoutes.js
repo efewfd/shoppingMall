@@ -129,38 +129,55 @@ router.get('/logout', (req, res) => {
 });
 
 // 아이디 찾기
-router.post('/find-id', async (req, res) => {
-  const { email } = req.body;
-  const user = await User.findOne({ email });
+router.post('/find-id', async (req, res) => {  
+  try {
+    const { email } = req.body;
 
-  if (!user) {
-    return res.status(404).json({ message: '해당 이메일로 등록된 아이디가 없습니다.' });
+    const [rows] = await db.execute('SELECT user_id FROM users WHERE email = ?', [email]);
+
+    if (!rows.length) {
+      return res.status(404).json({ message: '해당 이메일로 등록된 아이디가 없습니다.' });
+    }
+
+    res.json({ userId: rows[0].user_id });
+  } catch(err) {
+    console.error('[아이디 찾기 오류]', err.message);
+    res.status(500).json({ message: '서버 오류' });
   }
 
-  res.json({ userId: user.userId });
 });
 
 // 비밀번호 찾기
 router.post('/find-password', async (req, res) => {
   const { userId, email } = req.body;
-  const user = await User.findOne({ userId, email });
 
-  if (!user) {
-    return res.status(404).json({ message: '아이디 또는 이메일이 일치하지 않습니다.' });
+  try {
+    const [rows] = await db.execute('SELECT * FROM users WHERE user_id = ? AND email = ?', [userId, email]);
+    
+    if (!rows.length) {
+      return res.status(404).json({ message: '아이디 또는 이메일이 일치하지 않습니다.' });
+    }
+    // WARNING: 실사용 서비스에서는 절대 비밀번호를 그대로 반환 X
+    res.json({ message: '계정 확인 완료' });
+  } catch {
+    console.error('[비밀번호 찾기 오류]', err.message);
+    res.status(500).json({ message: '서버 오류' });
   }
-
-  // WARNING: 실사용 서비스에서는 절대 비밀번호를 그대로 반환 X
-  res.json({ password: user.password });
 });
 
 // 비밀번호 재설정
 router.post('/reset-password', async (req, res) => {
   const { userId, newPassword } = req.body;
-  const hashedPw = await bcrypt.hash(newPassword, 10);
 
-  await User.updateOne({ userId }, { $set: { password: hashedPw } });
+  try {
+    const hashedPw = await bcrypt.hash(newPassword, 10);
+    await db.execute('UPDATE users SET password = ? WHERE user_id = ?', [hashedPw, userId]);
 
-  res.json({ message: '비밀번호가 변경되었습니다.' });
+    res.json({ message: '비밀번호가 변경되었습니다.' });
+  } catch(err) {
+    console.error('[비밀번호 재설정 오류]', err.message);
+    res.status(500).json({ message: '서버 오류' });
+  }
 });
 
 module.exports = router;

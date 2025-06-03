@@ -39,7 +39,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     }
     // 추천 상품 이미지 로딩
     try {
-        const res = await fetch("/api/product/random-products?count=5");
+        const res = await fetch("/api/products/random-products?count=5");
         const products = await res.json();
         if (!Array.isArray(products) || products.length === 0) return;
 

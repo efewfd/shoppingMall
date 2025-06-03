@@ -10,12 +10,19 @@ body {
     padding: 20px;
 }
 .recommended-box {
+    height: 250px;
     border: 1px solid #ccc;
     border-radius: 20px;
     padding: 40px;
     text-align: center;
     font-size: 20px;
     margin-bottom: 40px;
+}
+#recommend-image {
+  width: 100%;           /* 원하는 너비 */
+  height: 100%;          /* 원하는 높이 */
+  object-fit: cover;      /* 이미지 비율 유지하며 잘라내기 */
+  display: block;  /* 라운드 처리 */
 }
 .main-section {
     display: flex;

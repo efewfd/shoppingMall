@@ -67,86 +67,91 @@
     </ul>
   </div>
 
-  <div class="mypage-wrapper">
-    <div class="sidebar">
-      <ul>
-        <li><a href="myInfo.html">MY 정보</a></li>
-          <li><a href="cart.html">장바구니</a></li>
+  <div class="container">
+    <header>CART</header>
+
+    <div class="mypage-wrapper">
+      <aside class="side-menu">
+        <ul>
+          <li><a href="myInfo.html">MY 정보</a></li>
+          <li class="active">장바구니</li>
           <li><a href="delivery.html">배송조회</a></li>
           <li><a href="faq.html">FAQ</a></li>
           <li>1:1 문의</li>
-      </ul>
-    </div>
+        </ul>
+      </aside>
+    
+    
 
-    <div class="cart-area">
-      <h2>cart</h2>
+      <div class="cart-area">
 
-      <!-- 비어있을 때 -->
-      <table class="cart-table empty">
-        <thead>
-          <tr>
-            <th><input type="checkbox" /></th>
-            <th>이미지</th>
-            <th>상품명</th>
-            <th>가격</th>
-            <th>수량</th>
-            <th>배송구분</th>
-            <th>배송비</th>
-            <th>합계</th>
-            <th>선택</th>
-          </tr>       
-        </thead>
-        <tbody>
-          <tr><td colspan="9" class="empty-msg">장바구니가 비어있습니다</td></tr>
-        </tbody>
-      </table>
+        <!-- 비어있을 때 -->
+        <table class="cart-table empty">
+          <thead>
+            <tr>
+              <th><input type="checkbox" /></th>
+              <th>이미지</th>
+              <th>상품명</th>
+              <th>가격</th>
+              <th>수량</th>
+              <th>배송구분</th>
+              <th>배송비</th>
+              <th>합계</th>
+              <th>선택</th>
+            </tr>       
+          </thead>
+          <tbody>
+            <tr><td colspan="9" class="empty-msg">장바구니가 비어있습니다</td></tr>
+          </tbody>
+        </table>
 
-      <!-- 상품이 담겼을 때 -->
-      <table class="cart-table full" style="display: none;">
-        <thead>
-          <tr>
-            <th><input type="checkbox" /></th>
-            <th>이미지</th>
-            <th>상품명</th>
-            <th>가격</th>
-            <th>수량</th>
-            <th>배송구분</th>
-            <th>배송비</th>
-            <th>합계</th>
-            <th>선택</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <!-- <td><input type="checkbox" /></td>
-            <td><img src="test-image.jpg" alt="상품" class="item-img" /></td>
-            <td>기본 트위드 자켓</td>
-            <td>35,820원</td>
-            <td>
-              <button>-</button>
-              1
-              <button>+</button>
-              <button>수정</button>
-            </td>
-            <td>무료배송</td>
-            <td>0원</td>
-            <td>35,820원</td>
-            <td>
-              <button>주문하기</button>
-              <button>삭제하기</button>
-            </td> -->
-          </tr>
-        </tbody>
-      </table>
+        <!-- 상품이 담겼을 때 -->
+        <table class="cart-table full" style="display: none;">
+          <thead>
+            <tr>
+              <th><input type="checkbox" /></th>
+              <th>이미지</th>
+              <th>상품명</th>
+              <th>가격</th>
+              <th>수량</th>
+              <th>배송구분</th>
+              <th>배송비</th>
+              <th>합계</th>
+              <th>선택</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <!-- <td><input type="checkbox" /></td>
+              <td><img src="test-image.jpg" alt="상품" class="item-img" /></td>
+              <td>기본 트위드 자켓</td>
+              <td>35,820원</td>
+              <td>
+                <button>-</button>
+                1
+                <button>+</button>
+                <button>수정</button>
+              </td>
+              <td>무료배송</td>
+              <td>0원</td>
+              <td>35,820원</td>
+              <td>
+                <button>주문하기</button>
+                <button>삭제하기</button>
+              </td> -->
+            </tr>
+          </tbody>
+        </table>
 
-      <div class="cart-summary" style="display: none;">
-        <!-- 총 구매금액: 35,820원 + 배송료: 0원 = <strong>35,820원</strong> -->
-      </div>
+        <div class="cart-summary" style="display: none;">
+          <!-- 총 구매금액: 35,820원 + 배송료: 0원 = <strong>35,820원</strong> -->
+        </div>
 
-      <div class="cart-buttons" style="display: none;">
-        <button onclick="submitAllOrders()">주문하기</button>
-        <button onclick="clearCart()">장바구니 비우기</button>
-        <button><a href="./home.html">쇼핑 계속하기</a></button>
+        <div class="cart-buttons" style="display: none;">
+          <button onclick="submitAllOrders()">주문하기</button>
+          <button onclick="clearCart()">장바구니 비우기</button>
+          <button><a href="./home.html">쇼핑 계속하기</a></button>
+        </div>
       </div>
     </div>
   </div>
