@@ -1,0 +1,69 @@
+/* 상품 등록 전체 폼 */
+.product-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 30px;
+  align-items: flex-start;
+}
+
+/* input 줄 */
+.input-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* 공통 input 스타일 */
+.product-form input,
+.product-form select,
+.product-form button {
+  font-size: 14px;
+  padding: 6px 10px;
+  height: 34px;
+  box-sizing: border-box;
+}
+
+/* 고정 너비 input */
+.input-row input[type="text"],
+.input-row input[type="number"] {
+  width: 180px;
+}
+
+/* 파일 선택 input - 옆에 들어가게 */
+.input-row input[type="file"] {
+  min-width: 220px;
+  flex: 1;
+  font-size: 14px;
+  height: 34px;
+  padding: 6px 10px;
+  box-sizing: border-box;
+}
+
+/* 상품 목록 테이블 내 input 스타일 개선 */
+#product-table input[type="text"],
+#product-table input[type="number"] {
+  width: 300px;          /* 조금 넉넉하게 */
+  height: 34px;          /* 상품 등록 input과 동일 높이 */
+  padding: 6px 10px;     /* 내부 여백 */
+  font-size: 14px;       /* 폰트 가독성 개선 */
+  box-sizing: border-box;
+  margin-right: 8px;     /* 인접한 셀과 간격 확보 */
+}
+
+/* 테이블 내 버튼 간 간격 */
+#product-table button {
+  height: 34px;
+  padding: 6px 12px;
+  font-size: 14px;
+  margin-right: 6px;
+}
+
+/* 이미지 input 사이 간 간격 */
+#product-table td img {
+  margin-right: 12px;
+  max-width: 60px;
+  height: auto;
+}
+
+

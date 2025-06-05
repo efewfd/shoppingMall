@@ -12,64 +12,126 @@ window.addEventListener('DOMContentLoaded', async () => {
   const Params = new URLSearchParams(window.location.search);
   const productId = Params.get('id');
 
+   // ✅ 세션 로그인 상태 확인
+  let userId = null;
+  try {
+    const authRes = await fetch('/api/auth/user', { credentials: 'include' });
+    const authData = await authRes.json();
+
+    if (!authData.loggedIn) {
+      userId = null;
+    } else {
+      userId = authData.user.userId;
+    }
+  } catch (err) {
+    console.error('세션 확인 실패:', err);
+    userId = null;
+  }
+
   if (!productId) return;
 
   try {
-    console.log(Params.get('id'))
     const res = await fetch(`/api/products/${productId}`);
-
-    if (!res.ok) {
-    throw new Error("서버 응답 실패");
-    }
+    if (!res.ok) throw new Error("서버 응답 실패");
     const product = await res.json();
 
-    // null 체크
-    if (!product || !product.image_url) {
-      throw new Error("상품이 존재하지 않거나 이미지 정보 없음");
-    }
 
     // 이미지, 텍스트 연결
     document.querySelector('.detail-image img').src = product.image_url;
-    document.querySelector('.product-code').textContent = `상품번호: ${product._id}`;
+    document.querySelector('.product-code').textContent = `상품번호: ${productId}`;
     document.querySelector('.product-title').textContent = product.name;
     document.querySelector('.original-price').textContent = `${parseInt(product.price).toLocaleString()}원`;
+
+    if (!product || !product.image_url) throw new Error("상품이 존재하지 않거나 이미지 정보 없음");
     
     // 구매하기용 저장도 갱신 (장바구니/찜용 데이터 저장)
     window.productForCart = {
-      id: product._id,
-      code: product._id,  // 찜 토글에 사용
+      id: productId,
+      code: productId,  // 찜 토글에 사용
       title: product.name,
       price: product.price,
       image: product.image_url,
       stock: product.stock
     };
-    console.log("productForCart 저장됨:", window.productForCart);
 
-    const wishBtn = document.querySelector('.wishlist');
-    if (!window.productForCart) {
-      alert('상품 정보를 불러오는 중입니다.');
-      return;
-    }
+    wishBtn = document.querySelector('.wishlist');
+    if (!window.productForCart || !wishBtn) return;
 
-    if(wishBtn) {
+    if (!userId) {
+      wishBtn.disabled = true;
+      wishBtn.title = "로그인 후 찜할 수 있습니다.";
+    } else {
       wishBtn.addEventListener("click", () => {
-        console.log("찜 버튼 눌림");
         toggleWishlist(window.productForCart, wishBtn);
       });
 
+
       // 초기 찜 상태 반영
-      const wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
-      if(wishlist.some(item => item.id === product._id)) {
-        wishBtn.textContent = "찜 취소";
-        wishBtn.classList.add("active");
+      try {
+        const res = await fetch(`/api/wishlist/${userId}`);
+        const wishlist = await res.json();
+        const isWished = wishlist.some(item => item.product_id === productId || item.id === productId);
+        if (isWished) {
+          wishBtn.textContent = "찜 취소";
+          wishBtn.classList.add("active");
+        }
+      } catch (err) {
+        console.warn('초기 찜 상태 확인 실패:', err);
+      }
+    }
+    if (userId) {
+      try {
+        const res = await fetch(`/api/orders/${userId}`, { credentials: "include" });
+        const orders = await res.json();
+        const matchedOrder = orders.find(order => order.productId === productId && order.status === "배송완료");
+
+        const reviewWriteBtn = document.getElementById("toggle-review-write-btn");
+        if (reviewWriteBtn) {
+          reviewWriteBtn.style.display = matchedOrder ? "block" : "none";
+        }
+      } catch (err) {
+        console.warn("리뷰쓰기 조건 확인 실패:", err);
       }
     }
 
+    // ✅ 리뷰 등록 버튼 이벤트 연결 (세션 userId 활용)
+    const submitBtn = document.getElementById('submit-review-btn');
+    if (submitBtn) {
+      submitBtn.addEventListener('click', async () => {
+        const content = document.getElementById('review-content').value.trim();
+
+        if (!userId) {
+          alert('로그인이 필요합니다.');
+          window.location.href = '/Login.html';
+          return;
+        }
+
+        if (!content || selectedRating === 0) {
+          alert('내용과 별점을 모두 입력해주세요');
+          return;
+        }
+
+        await fetch('/api/reviews', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ productId, userId, content, rating: selectedRating })
+        });
+
+        alert('리뷰가 등록되었습니다.');
+        document.getElementById('review-content').value = '';
+        selectedRating = 0;
+        highlightStars(0);
+        document.getElementById('review-form').style.display = 'none';
+        await loadReviews(true);
+      });
+    }
+
   } catch (err) {
-    console.error('상품 정보 불러오기 실패:', err);
+    console.error('상품 정보 불러오기 실패:', err.message);
     alert('상품 정보를 불러올 수 없습니다.');
-    window.location.href = "/home.html";
   }
+
+  initReviewEvents();
 });
 
 // 상품 장바구니에 담기
@@ -153,7 +215,7 @@ function addToWishlist(product) {
   const wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
 
   // 중복 방지(상품 코드 기준)
-  const exists = wishlist.find(item => item.id === product.code);
+  const exists = wishlist.find(item => item.code === product.code);
   if(exists) {
     alert("이미 찜한 상품입니다.");
     return;
@@ -167,15 +229,18 @@ function addToWishlist(product) {
 
 // 찜
 async function toggleWishlist(product, buttonElement) {
-  const userId = localStorage.getItem('userId');
-  console.log('userId:', userId);
-  console.log('product.code:', product.id);
+  console.log("🟡 toggleWishlist 진입됨");
+  const res = await fetch('/api/auth/user', { credentials: 'include' });
+  const data = await res.json();
 
-  if(!userId) {
-    alert('로그인 후 찜할 수 있습니다.');
+  if (!data.loggedIn) {
+    alert('로그인이 필요합니다.');
+    window.location.href = '/Login.html';
     return;
   }
 
+  const userId = data.user.userId;
+  const productId = product.id || product.code;
   const isWished = buttonElement.classList.contains("active");
 
   try {
@@ -184,11 +249,13 @@ async function toggleWishlist(product, buttonElement) {
       const deleteRes = await fetch('/api/wishlist', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, productId: product.code })
+        body: JSON.stringify({ userId, productId })
       });
 
       if (!deleteRes.ok) throw new Error('찜 삭제 실패');
 
+      console.log("❌ 찜 취소 완료");
+      alert("찜을 취소했습니다.");
       buttonElement.textContent = "찜하기";
       buttonElement.classList.remove("active");
     } else {
@@ -196,22 +263,21 @@ async function toggleWishlist(product, buttonElement) {
       const postRes = await fetch('/api/wishlist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId,
-          productId: product.code,
-          product: {
-            title: product.title,
-            price: product.price,
-            image: product.image,
-            stock: product.stock
-          }
-        })
+        body: JSON.stringify({ userId, productId })
       });
 
-      if (!postRes.ok) throw new Error('찜 등록 실패');
+      if (!postRes.ok) {
+        const result = await postRes.json();
+        if (postRes.status === 409) {
+          alert("이미 찜한 상품입니다.");
+        } else {
+          throw new Error(result.message || "찜 등록 실패");
+        }
+        return;
+      }
 
-      const result = await postRes.json();
-      console.log("찜 등록 응답:", result);
+      console.log("✅ 찜 등록 성공");
+      alert("찜한 상품에 추가되었습니다.");
       buttonElement.textContent = "찜 취소";
       buttonElement.classList.add("active");
     }

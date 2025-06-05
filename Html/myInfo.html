@@ -104,181 +104,188 @@
   </div>
   <script>
     window.addEventListener("DOMContentLoaded", async () => {
-      // 세션 기반 사용자 확인
-      const sessionRes = await fetch("/api/auth/user", { credentials: "include" });
-      const sessionData = await sessionRes.json();
-      console.log("세션 응답:", sessionData);
-      if (!sessionData.loggedIn) {
-        alert("로그인이 필요합니다.");
-        window.location.href = "/Login.html";
+    // ✅ 세션 기반 사용자 확인
+    const sessionRes = await fetch("/api/auth/user", { credentials: "include" });
+    const sessionData = await sessionRes.json();
+    console.log("세션 응답:", sessionData);
+    if (!sessionData.loggedIn) {
+      alert("로그인이 필요합니다.");
+      window.location.href = "/Login.html";
+      return;
+    }
+
+    const userId = sessionData.user.userId;
+    console.log("userId 확인:", userId);
+
+    // ✅ 회원 정보 가져오기
+    try {
+      const res = await fetch(`/api/users/${userId}`, { credentials: "include" });
+      if (!res.ok) throw new Error("회원 정보 조회 실패");
+      const user = await res.json();
+
+      document.getElementById("username").textContent = user.name;
+      document.getElementById("email").value = user.email;
+      document.getElementById("name").value = user.name;
+    } catch (err) {
+      console.error("회원 정보 불러오기 실패:", err);
+    }
+
+    // ✅ 수정 버튼
+    document.getElementById("editBtn").addEventListener("click", () => {
+      document.getElementById("email").disabled = false;
+      document.getElementById("name").disabled = false;
+      document.getElementById("editBtn").style.display = "none";
+      document.getElementById("saveBtn").style.display = "inline-block";
+    });
+
+    // ✅ 저장 버튼
+    document.getElementById("saveBtn").addEventListener("click", async () => {
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+
+      try {
+        const res = await fetch(`/api/users/${userId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include", // ✅ 세션 유지
+          body: JSON.stringify({ name, email })
+        });
+        const data = await res.json();
+        alert(data.message);
+
+        // UI 반영
+        document.getElementById("username").textContent = name;
+        document.getElementById("email").disabled = true;
+        document.getElementById("name").disabled = true;
+        document.getElementById("editBtn").style.display = "inline-block";
+        document.getElementById("saveBtn").style.display = "none";
+      } catch (err) {
+        console.error("회원 정보 수정 실패:", err);
+      }
+    });
+
+    // ✅ 주문 내역 불러오기
+    try {
+      console.log("📡 fetch 주문 내역 시작");
+
+      const orderRes = await fetch(`/api/orders/${userId}`, {
+        method: 'GET',
+        credentials: 'include',
+        cache: 'no-store'
+      });
+
+      if (!orderRes.ok) {
+        const errorText = await orderRes.text();
+        console.error(`❌ 주문 내역 응답 실패: ${orderRes.status}`, errorText);
+        document.getElementById("order-container").innerHTML = "<p>주문 내역을 불러오는 데 실패했습니다.</p>";
         return;
       }
 
-      const userId = sessionData.user.userId;
-      console.log("userId 확인:", userId);
+      const orders = await orderRes.json();
+      console.log("✅ 서버에서 받아온 주문 목록:", orders);
 
-      //  회원 정보 가져오기
-      try {
-        const res = await fetch(`/api/users/${userId}`, { credentials: "include" });
-        if (!res.ok) throw new Error("회원 정보 조회 실패");
-        const user = await res.json();
 
-        document.getElementById('username').textContent = user.name;
-        document.getElementById('email').value = user.email;
-        document.getElementById('name').value = user.name;
-      } catch(err) {
-        console.error("회원 정보 불러오기 실패:", err);
+      const validatedOrders = orders.filter(order =>
+        order.product && order.product.title && order.product.image
+      );
+
+      const orderContainer = document.getElementById("order-container");
+
+      if (!validatedOrders.length) {
+        orderContainer.innerHTML = "<p>주문 내역이 없습니다.</p>";
+        return;
       }
 
-      // 수정 버튼 동작
-      document.getElementById("editBtn").addEventListener("click", () => {
-        document.getElementById("email").disabled = false;
-        document.getElementById("name").disabled = false;
-        document.getElementById("editBtn").style.display = "none";
-        document.getElementById("saveBtn").style.display = "inline-block";
+      orderContainer.innerHTML = validatedOrders.map(order => {
+        const created = new Date(order.createdAt).toLocaleDateString();
+        return `
+          <div class="order-item">
+            <img src="${order.product.image || '/images/default.png'}" alt="상품 이미지"
+                style="width: 80px; height: 80px; object-fit: cover; margin-right: 10px;" />
+            <div>
+              <p><strong>${order.product.title || '상품명 없음'}</strong></p>
+              <p>주문일: ${created}</p>
+              <p>수량: ${order.quantity}</p>
+              <p>상태: ${order.status}</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+    } catch (err) {
+      console.error("❌ 주문 내역 불러오기 실패:", err);
+      document.getElementById("order-container").innerHTML = "<p>주문 내역을 불러오는 데 실패했습니다.</p>";
+    }
+
+    // ✅ 찜한 상품 불러오기 (MySQL 버전)
+    try {
+      const res = await fetch(`/api/wishlist/${userId}`, { credentials: "include" });
+      const wishlist = await res.json();
+
+      const container = document.getElementById("wishlist-container");
+
+      if (!wishlist.length) {
+        container.innerHTML = "<p>찜한 상품이 없습니다.</p>";
+        return;
+      }
+
+      container.innerHTML = wishlist.map(item => `
+        <div class="wishlist-item" data-product-id="${item.id}">
+          <img src="${item.image_url}" style="width: 80px; height: 80px; object-fit: cover; margin-right: 10px;" />
+          <strong>${item.name}</strong> (${parseInt(item.price).toLocaleString()}원)
+          <button class="remove-wishlist-btn" style="margin-left: 10px;">♥</button>
+        </div>
+      `).join('');
+
+      // ✅ 찜한 상품 클릭 시 상세 페이지로 이동
+      document.querySelectorAll(".wishlist-item").forEach(item => {
+        item.addEventListener("click", (e) => {
+          if (e.target.classList.contains("remove-wishlist-btn")) return;
+          const productId = item.dataset.productId;
+          if (productId) {
+            window.location.href = `/productDetail.html?id=${productId}`;
+          }
+        });
       });
 
-      // 저장 버튼 동작
-      document.getElementById("saveBtn").addEventListener("click", async () => {
-        const name = document.getElementById("name").value;
-        const email = document.getElementById("email").value;
+    } catch (error) {
+      console.error("찜 목록 불러오기 실패:", error);
+    }
+
+    // ✅ ♥ 버튼 클릭 시 찜 삭제
+    document.querySelectorAll(".remove-wishlist-btn").forEach(btn => {
+      btn.addEventListener("click", async (e) => {
+        e.stopPropagation(); // 부모 클릭 이벤트 방지
+
+        const item = e.target.closest(".wishlist-item");
+        const productId = item.dataset.productId;
+
+        if (!confirm("찜 목록에서 제거하시겠습니까?")) return;
 
         try {
-          const res = await fetch(`/api/users/${userId}`, {
-            method: "PUT",
+          const res = await fetch("/api/wishlist", {
+            method: "DELETE",
             headers: { "Content-Type": "application/json" },
-            credentials: "include", // 세션 유지
-            body: JSON.stringify({ name, email })
+            body: JSON.stringify({ userId, productId })
           });
+
           const data = await res.json();
-          alert(data.message);
+          if (!res.ok) throw new Error(data.message || "삭제 실패");
 
-          // UI 반영
-          document.getElementById("username").textContent = name;
-          document.getElementById("email").disabled = true;
-          document.getElementById("name").disabled = true;
-          document.getElementById("editBtn").style.display = "inline-block";
-          document.getElementById("saveBtn").style.display = "none";
-        } catch(err) {
-          console.error("회원 정보 수정 실패:", err);
-        }
-      })
+          // DOM에서 항목 제거
+          item.remove();
 
-      // 찜한 상품 불러오기
-      try {
-        const res = await fetch(`/api/wishlist/${userId}`, { credentials: "include" });
-        const rawWishlist = await res.json();
-
-        //유효성 검사
-        const validatedWishlist = [];
-
-        for (const item of rawWishlist) {
-          if (!item || !item.productId || typeof item.productId !== 'string') {
-            console.warn("❌ 잘못된 찜 항목:", item);
-            continue;
+          // 빈 상태 처리
+          if (document.querySelectorAll(".wishlist-item").length === 0) {
+            document.getElementById("wishlist-container").innerHTML = "<p>찜한 상품이 없습니다.</p>";
           }
 
-          try {
-            const res = await fetch(`/api/products/${item.productId}`);
-            if (!res.ok) {
-              console.warn("❌ 삭제된 찜 상품:", item.productId);
-              continue;
-            }
-
-            const product = await res.json();
-
-            validatedWishlist.push({
-              ...item,
-              product
-            });
-          } catch (err) {
-            console.warn("❌ 유효하지 않은 찜 상품 요청 실패:", item.productId);
-          }
+        } catch (err) {
+          console.error("찜 삭제 실패:", err);
+          alert("찜 삭제 중 오류가 발생했습니다.");
         }
-
-
-        const container = document.getElementById("wishlist-container");
-
-        if (!validatedWishlist.length) {
-          container.innerHTML = "<p>찜한 상품이 없습니다.</p>";
-          return;
-        }
-
-        container.innerHTML = validatedWishlist.map(item => `
-          <div class="wishlist-item" data-product-id="${item.productId}">
-            <img src="${item.product.image_url}" style="width: 80px; height: 80px; object-fit: cover; margin-right: 10px; vertical-align: middle;" />
-            <strong>${item.product.name}</strong>(${item.product.price.toLocaleString()}원)
-            <button class="remove-wishlist-btn" style="margin-left: 10px;">♥</button>
-          </div>
-        `).join('');
-
-        // 찜한 상품 클릭 시 상세 페이지로 이동
-        document.querySelectorAll(".wishlist-item").forEach(item => {
-          item.addEventListener("click", (e) => {
-            if (e.target.classList.contains("remove-wishlist-btn")) return; // ♥ 버튼 제외
-            const productId = item.dataset.productId;
-            if (productId) {
-              window.location.href = `/productDetail.html?id=${productId}`;
-            }
-          });
-        });
-
-      } catch(error) {
-          console.error("찜 목록 불러오기 실패:", error);
-      }
-
-      // 주문 내역 불러오기
-      try {
-        const orderRes = await fetch(`/api/orders/${userId}`, { credentials: "include" });
-        const orders = await orderRes.json();
-
-        const validatedOrders = [];
-        console.log("서버에서 받아온 주문 목록:", orders);
-
-        for (const order of orders) {
-          if (!order.productId || typeof order.productId !== 'string') continue;
-
-          try {
-            const res = await fetch(`/api/products/${order.productId}`);
-            if (!res.ok) continue;
-
-            const product = await res.json();
-
-            validatedOrders.push({
-              ...order,
-              product
-            });
-          } catch (err) {
-            console.warn("유효하지 않은 주문 상품:", order.productId);
-          }
-        }
-
-        const orderContainer = document.getElementById("order-container");
-        if (!validatedOrders.length) {
-          orderContainer.innerHTML = "<p>주문 내역이 없습니다.</p>";
-          return;
-        }
-
-        orderContainer.innerHTML = orders.map(order => {
-          const created = new Date(order.createdAt).toLocaleDateString();
-          return `
-            <div class="order-item">
-              <img src="${order.product?.image || '/images/default.png'}"
-                alt="상품 이미지"
-                style="width: 80px; height: 80px; object-fit: cover; margin-right: 10px;" />
-              <div>
-                <p><strong>${order.product?.title || '상품명 없음'}</strong></p>
-                <p>주문일: ${created}</p>
-                <p>수량: ${order.quantity}</p>
-                <p>상태: ${order.status}</p>
-              </div>
-            </div>
-          `;
-        }).join('');
-      } catch(err) {
-        console.error("주문 내역 불러오기 실패:", err);
-      }
+      });
     });
+  });
   </script>
   <script src="../js/navbar.js"></script>
 </body>

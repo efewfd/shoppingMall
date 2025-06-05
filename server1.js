@@ -13,7 +13,9 @@ const faqRoutes = require('./routes/faqRoutes');
 const wishlistRouter = require('./routes/wishlist');
 const Order = require('./models/Order');
 const reviewRoutes = require('./routes/reviewRoutes');
+const Review = require('./models/review');
 const orderRoutes = require('./routes/orderRoutes');
+const popularRoutes = require('./routes/popularRoutes');
 const db = require('./js/db');
 
 const app = express();
@@ -42,11 +44,11 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // userId 받아서 찜 목록 조회
-app.get('/api/wishlist/:userId', async (req, res) => {
-  const { userId } = req.params;
-  const wishlist = await Wishlist.find({ userId });
-  res.json(wishlist);
-});
+// app.get('/api/wishlist/:userId', async (req, res) => {
+//   const { userId } = req.params;
+//   const wishlist = await Wishlist.find({ userId });
+//   res.json(wishlist);
+// });
 
 // 세션 설정
 app.use(session({
@@ -74,12 +76,13 @@ app.use('/admin', express.static(path.join(__dirname, 'Html', 'admin')));
 // 상품 API 연결
 app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes);
-app.use('/api/cart', cartRoutes);
+app.use('/api/cart', cartRoutes); //
 app.use('/api/users', userRoutes);
 app.use('/api/faqs', faqRoutes);
-app.use('/api/wishlist', wishlistRouter);
+app.use('/api/wishlist', wishlistRouter); //
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/popular-products', popularRoutes); //
 
 // 쇼핑몰 라우팅
 app.get('/', (req, res) => {
@@ -114,8 +117,7 @@ app.post('/api/orders', async (req, res) => {
     console.log("product.title in server:", product?.title);
 
     if (!userId || !productId) {
-      console.error('필수값 누락');
-      return res.status(400).json({ message: 'userId 또는 productId 없음' });
+      return res.status(400).json({ message: '필수값 누락' });
     }
 
     console.log("저장될 상품명:", product?.title); // 콘솔 찍어서 디버깅 확인
@@ -133,14 +135,6 @@ app.post('/api/orders', async (req, res) => {
       product?.title || '',    // product_title 저장!
       product?.image || ''
     ];
-
-    const newOrder = new Order({
-      userId,
-      productId,
-      quantity,
-      status,
-      product: req.body.product
-    });
 
     await db.execute(sql, values);
     res.status(201).json({ message: '주문 저장 완료' });
@@ -161,34 +155,13 @@ app.get('/api/orders/:userId', async (req, res) => {
 
 // GET /api/orders - 관리자용 전체 조회
 app.get('/api/orders', async (req, res) => {
-  const orders = await Order.find();
+  const orders = await Order.find({ userId: req.params.userId });
   res.json(orders);
 });
 
-// PATCH /api/orders/:id - 관리자용 상태 변경
-app.patch('/api/orders/:id', async (req, res) => {
-  const { status } = req.body;
-  const order = await Order.findByIdAndUpdate(req.params.id, { status }, { new: true });
-  res.json(order);
-});
-
-// app.post('/api/orders', async (req, res) => {
-//   console.log('[주문 요청 도착]', req.body);
-
-//   try {
-//     const { userId, productId, quantity, status } = req.body;
-
-//     if (!userId || !productId) {
-//       console.error("❌ 필수값 누락");
-//       return res.status(400).json({ message: "userId 또는 productId 없음" });
-//     }
-
-//     const newOrder = new Order({ userId, productId, quantity, status });
-//     await newOrder.save();
-
-//     res.json(newOrder);
-//   } catch (err) {
-//     console.error("❌ 주문 저장 중 에러:", err);
-//     res.status(500).json({ message: "서버 내부 오류", error: err.message });
-//   }
+// // PATCH /api/orders/:id - 관리자용 상태 변경
+// app.patch('/api/orders/:id', async (req, res) => {
+//   const { status } = req.body;
+//   const order = await Order.findByIdAndUpdate(req.params.id, { status }, { new: true });
+//   res.json(order);
 // });

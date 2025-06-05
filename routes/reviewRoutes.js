@@ -5,7 +5,9 @@ const Review = require('../models/review'); // 리뷰 모델
 // 리뷰 불러오기
 router.get('/:productId', async (req, res) => {
   const { productId } = req.params;
-  const { sort, page = 1, limit = 10 } = req.query;
+  const { sort } = req.query;
+  const limit = Number(req.query.limit || 10); //안전하게 변환
+  const page = Number(req.query.page || 1);
 
   let sortOption = { createdAt: -1 }; // 기본 최신순
 
@@ -14,7 +16,7 @@ router.get('/:productId', async (req, res) => {
 
   try {
     const total = await Review.countDocuments({ productId });
-    const reviews = await Review.find({ productId }).sort(sortOption).skip((page - 1) * limit).limit(Number(limit));
+    const reviews = await Review.find({ productId }).sort(sortOption).skip((page - 1) * limit).limit(limit);
     
     res.json({ reviews, total });
   } catch(err) {
